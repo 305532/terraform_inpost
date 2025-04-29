@@ -87,11 +87,7 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
   subnets            = var.public_subnets
-
-  load_balancer_attributes {
-    key   = "routing.http.drop_invalid_header_fields.enabled"
-    value = "true"
-  }
+  drop_invalid_header_fields = true
 
   tags = {
     Name        = "alb-${var.environment}"
