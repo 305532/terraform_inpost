@@ -1,3 +1,11 @@
+resource "aws_kms_key" "tfstate" {
+  description             = "CMK for encrypting Terraform state bucket"
+  deletion_window_in_days = 7
+  tags = {
+    Name = "${var.bucket_name}-cmk"
+  }
+}
+
 resource "aws_s3_bucket" "tfstate" {
   bucket = var.bucket_name
   acl    = "private"
@@ -9,10 +17,12 @@ resource "aws_s3_bucket" "tfstate" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.tfstate.arn
       }
     }
   }
+
   lifecycle {
     prevent_destroy = true
   }
@@ -22,6 +32,7 @@ resource "aws_s3_bucket" "tfstate" {
     Environment = var.aws_region
   }
 }
+
 resource "aws_s3_bucket_public_access_block" "tfstate" {
   bucket                  = aws_s3_bucket.tfstate.id
   block_public_acls       = true
@@ -38,6 +49,10 @@ resource "aws_dynamodb_table" "lock" {
   attribute {
     name = "LockID"
     type = "S"
+  }
+
+  server_side_encryption {
+    enabled = true
   }
 
   tags = {

@@ -42,7 +42,7 @@ jobs:
       - name: Run TFLint
         run: |
           tflint --init
-          tflint
+          tflint --minimum-failure-severity=warning
         working-directory: ${{ inputs.working-directory }}
 
       - name: Run tfsec

@@ -23,8 +23,9 @@ resource "aws_ecs_cluster" "this" {
 }
 
 resource "aws_security_group" "alb_sg" {
-  name   = "alb-sg-${var.environment}"
-  vpc_id = var.vpc_id
+  name        = "alb-sg-${var.environment}"
+  description = "Allow HTTP/HTTPS ingress to ALB"
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "Allow HTTP from anywhere"
@@ -47,11 +48,17 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name        = "alb-sg-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 resource "aws_security_group" "task_sg" {
-  name   = "task-sg-${var.environment}"
-  vpc_id = var.vpc_id
+  name        = "task-sg-${var.environment}"
+  description = "Allow ECS task traffic from ALB"
+  vpc_id      = var.vpc_id
 
   ingress {
     description     = "Allow container port from ALB"
@@ -67,6 +74,11 @@ resource "aws_security_group" "task_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name        = "task-sg-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 resource "aws_lb" "alb" {
@@ -75,6 +87,16 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
   subnets            = var.public_subnets
+
+  load_balancer_attributes {
+    key   = "routing.http.drop_invalid_header_fields.enabled"
+    value = "true"
+  }
+
+  tags = {
+    Name        = "alb-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 resource "aws_lb_target_group" "tg" {
@@ -89,6 +111,11 @@ resource "aws_lb_target_group" "tg" {
     interval            = 30
     healthy_threshold   = 2
     unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name        = "tg-${var.environment}"
+    Environment = var.environment
   }
 }
 
@@ -147,10 +174,10 @@ resource "aws_ecs_task_definition" "this" {
       ]
 
       environment = [
-        { name = "DB_HOST"  , value = var.db_host  },
-        { name = "DB_PORT"  , value = tostring(var.db_port) },
-        { name = "DB_NAME"  , value = var.db_name  },
-        { name = "DB_USER"  , value = var.db_user  }
+        { name = "DB_HOST",  value = var.db_host   },
+        { name = "DB_PORT",  value = tostring(var.db_port) },
+        { name = "DB_NAME",  value = var.db_name   },
+        { name = "DB_USER",  value = var.db_user   }
       ]
 
       secrets = [
