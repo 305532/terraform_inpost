@@ -1,4 +1,3 @@
-# IAM role for ECS Task execution
 data "aws_iam_policy_document" "ecs_exec_assume" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -19,12 +18,10 @@ resource "aws_iam_role_policy_attachment" "exec_attach" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# ECS Cluster
 resource "aws_ecs_cluster" "this" {
   name = "${var.environment}-ecs-cluster"
 }
 
-# Security Groups
 resource "aws_security_group" "alb_sg" {
   name   = "alb-sg-${var.environment}"
   vpc_id = var.vpc_id
@@ -67,7 +64,6 @@ resource "aws_security_group" "task_sg" {
   }
 }
 
-# Application Load Balancer
 resource "aws_lb" "alb" {
   name               = "alb-${var.environment}"
   internal           = false
@@ -119,13 +115,11 @@ resource "aws_lb_listener" "https" {
   }
 }
 
-# CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/ecs/${var.environment}-webgoat"
   retention_in_days = 7
 }
 
-# ECS Task Definition
 resource "aws_ecs_task_definition" "this" {
   family                   = "${var.environment}-webgoat"
   requires_compatibilities = ["FARGATE"]
@@ -173,7 +167,6 @@ resource "aws_ecs_task_definition" "this" {
   ])
 }
 
-# ECS Service
 resource "aws_ecs_service" "this" {
   name            = "${var.environment}-webgoat-svc"
   cluster         = aws_ecs_cluster.this.id

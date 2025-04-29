@@ -32,7 +32,7 @@ resource "aws_db_instance" "this" {
   engine                 = "mysql"
   engine_version         = "8.0"
   instance_class         = var.instance_class
-  name                   = var.db_name
+  db_name                   = var.db_name
   username               = var.username
   password               = random_password.db.result
   parameter_group_name   = "default.mysql8.0"
