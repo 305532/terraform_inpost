@@ -66,5 +66,23 @@ variable "rds_instance_class" {
 variable "bucket_name" {
   description = "S3 bucket for application assets"
   type        = string
-  default     = "myapp-${var.environment}-assets"
+  default     = "application_bucket"
+}
+
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "public_subnet_cidrs" {
+  description = "List of CIDR blocks for the public subnets"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+}
+
+variable "private_subnet_cidrs" {
+  description = "List of CIDR blocks for the private subnets"
+  type        = list(string)
+  default     = ["10.0.101.0/24", "10.0.102.0/24"]
 }
