@@ -10,6 +10,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 backend.tfvars
+.terraform.lock.hcl
 *.backend.tfvars
 *.pem
 *.key
