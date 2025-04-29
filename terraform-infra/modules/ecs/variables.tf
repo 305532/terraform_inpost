@@ -1,0 +1,16 @@
+variable "aws_region"            { type = string }
+variable "vpc_id"                { type = string }
+variable "public_subnets"        { type = list(string) }
+variable "private_subnets"       { type = list(string) }
+variable "certificate_arn"       { type = string }
+variable "image"                 { type = string }
+variable "environment"           { type = string }
+variable "desired_count"         { type = number }
+variable "task_cpu"              { type = string }
+variable "task_memory"           { type = string }
+variable "container_port"        { type = number }
+variable "db_host"               { type = string }
+variable "db_port"               { type = number }
+variable "db_name"               { type = string }
+variable "db_user"               { type = string }
+variable "db_password_secret_arn" { type = string }

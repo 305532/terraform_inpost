@@ -1,0 +1,28 @@
+name: Terraform CI Checks
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '**/*.tf'
+      - '**/*.tfvars'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - '**/*.tf'
+      - '**/*.tfvars'
+      - '.github/workflows/**'
+
+jobs:
+  backend-checks:
+    uses: ./.github/workflows/terraform-checks.yml
+    with:
+      working-directory: terraform-backend
+
+  main-checks:
+    uses: ./.github/workflows/terraform-checks.yml
+    with:
+      working-directory: terraform-infra

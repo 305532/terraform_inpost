@@ -1,0 +1,56 @@
+name: Terraform Checks
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: "Directory to run Terraform commands in"
+        required: true
+        type: string
+
+jobs:
+  lint-and-scan:
+    name: Lint, Validate & Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.4.0"
+
+      - name: Terraform fmt
+        run: terraform fmt -check
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Terraform init (no backend)
+        run: terraform init -backend=false
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Terraform validate
+        run: terraform validate
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v1
+
+      - name: Run TFLint
+        run: |
+          tflint --init
+          tflint
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-action@v1
+        with:
+          directory: ${{ inputs.working-directory }}
+
+      - name: Run Checkov
+        uses: bridgecrew/checkov-action@v10
+        with:
+          directory: ${{ inputs.working-directory }}
