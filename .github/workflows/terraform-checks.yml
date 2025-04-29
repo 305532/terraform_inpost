@@ -37,7 +37,7 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v1
+        uses: terraform-linters/setup-tflint@v4
 
       - name: Run TFLint
         run: |
@@ -46,11 +46,11 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Run tfsec
-        uses: aquasecurity/tfsec-action@v1
+        uses: aquasecurity/tfsec-action@v1.0.0
         with:
           directory: ${{ inputs.working-directory }}
 
       - name: Run Checkov
-        uses: bridgecrew/checkov-action@v10
+        uses: bridgecrew/checkov-action@v12
         with:
           directory: ${{ inputs.working-directory }}
